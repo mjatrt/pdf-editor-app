@@ -1,5 +1,5 @@
 import { PDFDocument, rgb, degrees } from "pdf-lib";
-import { loadJapaneseFont } from "./font";
+import { loadJapaneseFont, registerFontkit } from "./font";
 import type { WatermarkOptions } from "@/types/pdf";
 
 const DEFAULT_OPTIONS: WatermarkOptions = {
@@ -16,6 +16,7 @@ export async function addWatermark(
 ): Promise<Uint8Array> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const pdf = await PDFDocument.load(pdfBuffer);
+  registerFontkit(pdf);
   const fontBytes = await loadJapaneseFont();
   const font = await pdf.embedFont(fontBytes);
   const pages = pdf.getPages();

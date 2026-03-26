@@ -1,5 +1,5 @@
 import { PDFDocument, rgb } from "pdf-lib";
-import { loadJapaneseFont } from "./font";
+import { loadJapaneseFont, registerFontkit } from "./font";
 import type { TextAnnotation, TextEdit } from "@/types/pdf";
 
 export async function addTexts(
@@ -7,6 +7,7 @@ export async function addTexts(
   annotations: TextAnnotation[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBuffer);
+  registerFontkit(pdf);
   const fontBytes = await loadJapaneseFont();
   const font = await pdf.embedFont(fontBytes);
   const pages = pdf.getPages();
@@ -40,6 +41,7 @@ export async function applyTextEdits(
   annotations: TextAnnotation[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBuffer);
+  registerFontkit(pdf);
   const fontBytes = await loadJapaneseFont();
   const font = await pdf.embedFont(fontBytes);
   const pages = pdf.getPages();
