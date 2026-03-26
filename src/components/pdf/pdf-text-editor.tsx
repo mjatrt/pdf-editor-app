@@ -65,7 +65,6 @@ export function PdfTextEditor({
   const [editColor, setEditColor] = useState("#000000");
 
   const textCacheRef = useRef<Map<number, ExtractedTextItem[]>>(new Map());
-  const fileBufferRef = useRef<Promise<ArrayBuffer> | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ReactPdf, setReactPdf] = useState<any>(null);
@@ -79,15 +78,14 @@ export function PdfTextEditor({
     });
   }, []);
 
-  // Cache file buffer
+  // Clear cache when file changes
   useEffect(() => {
-    fileBufferRef.current = file.arrayBuffer();
     textCacheRef.current.clear();
   }, [file]);
 
   // Extract text when in edit mode
   useEffect(() => {
-    if (mode !== "edit" || !fileBufferRef.current) return;
+    if (mode !== "edit") return;
 
     const cached = textCacheRef.current.get(currentPage);
     if (cached) {
@@ -96,7 +94,8 @@ export function PdfTextEditor({
     }
 
     setExtracting(true);
-    fileBufferRef.current
+    file
+      .arrayBuffer()
       .then((buffer) => extractPageTextItems(buffer, currentPage))
       .then((items) => {
         textCacheRef.current.set(currentPage, items);
