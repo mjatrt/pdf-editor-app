@@ -69,10 +69,12 @@ export function PdfTextEditor({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ReactPdf, setReactPdf] = useState<any>(null);
+  const [pdfjsVersion, setPdfjsVersion] = useState("");
 
   useEffect(() => {
     import("react-pdf").then((mod) => {
       mod.pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${mod.pdfjs.version}/build/pdf.worker.min.mjs`;
+      setPdfjsVersion(mod.pdfjs.version);
       setReactPdf(mod);
     });
   }, []);
@@ -346,6 +348,10 @@ export function PdfTextEditor({
             file={file}
             onLoadSuccess={handleDocumentLoad}
             loading={<Skeleton className="w-[600px] h-[800px]" />}
+            options={{
+              cMapUrl: `//unpkg.com/pdfjs-dist@${pdfjsVersion}/cmaps/`,
+              cMapPacked: true,
+            }}
           >
             <Page
               pageNumber={currentPage + 1}

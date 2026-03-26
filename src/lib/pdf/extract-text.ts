@@ -7,7 +7,11 @@ export async function extractPageTextItems(
   const pdfjs = await import("pdfjs-dist");
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-  const doc = await pdfjs.getDocument({ data: pdfBuffer }).promise;
+  const doc = await pdfjs.getDocument({
+    data: pdfBuffer,
+    cMapUrl: `//unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+    cMapPacked: true,
+  }).promise;
   const page = await doc.getPage(pageIndex + 1);
   const textContent = await page.getTextContent();
 
