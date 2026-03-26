@@ -50,3 +50,27 @@ export interface TextAnnotation {
   fontSize: number;
   color: { r: number; g: number; b: number };
 }
+
+export interface ExtractedTextItem {
+  id: string;
+  pageIndex: number;
+  text: string;
+  pdfX: number;
+  pdfY: number;
+  pdfWidth: number;
+  pdfHeight: number;
+  fontName: string;
+  fontSize: number;
+}
+
+export interface TextEdit {
+  id: string;
+  pageIndex: number;
+  originalText: string;
+  newText: string;
+  coverRect: { x: number; y: number; width: number; height: number };
+  x: number;
+  y: number;
+  fontSize: number;
+  color: { r: number; g: number; b: number };
+}
