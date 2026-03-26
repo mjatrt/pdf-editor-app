@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -253,6 +253,13 @@ export function PdfTextEditor({
 
   const { Document, Page } = ReactPdf;
   const scale = pageSize ? RENDER_WIDTH / pageSize.width : 1;
+  const documentOptions = useMemo(
+    () => ({
+      cMapUrl: `//unpkg.com/pdfjs-dist@${pdfjsVersion}/cmaps/`,
+      cMapPacked: true,
+    }),
+    [pdfjsVersion]
+  );
 
   return (
     <div className="space-y-4">
@@ -347,10 +354,7 @@ export function PdfTextEditor({
             file={file}
             onLoadSuccess={handleDocumentLoad}
             loading={<Skeleton className="w-[600px] h-[800px]" />}
-            options={{
-              cMapUrl: `//unpkg.com/pdfjs-dist@${pdfjsVersion}/cmaps/`,
-              cMapPacked: true,
-            }}
+            options={documentOptions}
           >
             <Page
               pageNumber={currentPage + 1}
