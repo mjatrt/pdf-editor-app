@@ -1,4 +1,5 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
+import { loadJapaneseFont } from "./font";
 import type { TextAnnotation, TextEdit } from "@/types/pdf";
 
 export async function addTexts(
@@ -6,7 +7,8 @@ export async function addTexts(
   annotations: TextAnnotation[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBuffer);
-  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const fontBytes = await loadJapaneseFont();
+  const font = await pdf.embedFont(fontBytes);
   const pages = pdf.getPages();
 
   for (const annotation of annotations) {
@@ -38,7 +40,8 @@ export async function applyTextEdits(
   annotations: TextAnnotation[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBuffer);
-  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const fontBytes = await loadJapaneseFont();
+  const font = await pdf.embedFont(fontBytes);
   const pages = pdf.getPages();
 
   // Apply text edits (white rectangle + replacement text)
