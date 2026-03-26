@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X, Type, Pencil } from "lucide-react";
 import { extractPageTextItems, pdfToCanvas } from "@/lib/pdf/extract-text";
+import { FONT_OPTIONS } from "@/lib/pdf/font";
+import type { FontKey } from "@/lib/pdf/font";
 import type { TextAnnotation, ExtractedTextItem, TextEdit } from "@/types/pdf";
 
 const RENDER_WIDTH = 600;
@@ -50,6 +52,7 @@ export function PdfTextEditor({
   );
   const [inputText, setInputText] = useState("");
   const [fontSize, setFontSize] = useState(16);
+  const [fontKey, setFontKey] = useState<FontKey>("noto-sans");
   const [color, setColor] = useState("#000000");
   const [loaded, setLoaded] = useState(false);
 
@@ -62,6 +65,7 @@ export function PdfTextEditor({
   );
   const [editText, setEditText] = useState("");
   const [editFontSize, setEditFontSize] = useState(16);
+  const [editFontKey, setEditFontKey] = useState<FontKey>("noto-sans");
   const [editColor, setEditColor] = useState("#000000");
 
   const textCacheRef = useRef<Map<number, ExtractedTextItem[]>>(new Map());
@@ -162,11 +166,12 @@ export function PdfTextEditor({
       text: inputText,
       fontSize,
       color: hexToRgb(color),
+      fontKey,
     });
 
     setInputPos(null);
     setInputText("");
-  }, [inputPos, inputText, fontSize, color, currentPage, onAddAnnotation]);
+  }, [inputPos, inputText, fontSize, fontKey, color, currentPage, onAddAnnotation]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -213,6 +218,7 @@ export function PdfTextEditor({
       y: editingItem.pdfY,
       fontSize: editFontSize,
       color: hexToRgb(editColor),
+      fontKey: editFontKey,
     };
 
     // Replace existing edit or add new one
@@ -230,6 +236,7 @@ export function PdfTextEditor({
     editingItem,
     editText,
     editFontSize,
+    editFontKey,
     editColor,
     textEdits,
     onTextEditsChange,
@@ -286,7 +293,21 @@ export function PdfTextEditor({
         {/* Controls bar */}
         <div className="flex items-center justify-between rounded-lg border p-3 bg-card mt-2">
           <TabsContent value="add">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-1">
+                <Label className="text-xs mr-1">フォント:</Label>
+                <select
+                  value={fontKey}
+                  onChange={(e) => setFontKey(e.target.value as FontKey)}
+                  className="h-7 text-xs rounded border bg-background px-1"
+                >
+                  {FONT_OPTIONS.map((f) => (
+                    <option key={f.key} value={f.key}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="flex items-center gap-1">
                 <Label className="text-xs mr-1">サイズ:</Label>
                 <Input
@@ -606,7 +627,7 @@ export function PdfTextEditor({
           <DialogHeader>
             <DialogTitle>テキストを編集</DialogTitle>
             <DialogDescription>
-              元のテキストを置き換えます。フォントはHelveticaに変更されます。
+              元のテキストを置き換えます。フォントを選択できます。
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -630,7 +651,21 @@ export function PdfTextEditor({
                 className="mt-1"
               />
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-1">
+                <Label className="text-xs">フォント:</Label>
+                <select
+                  value={editFontKey}
+                  onChange={(e) => setEditFontKey(e.target.value as FontKey)}
+                  className="h-7 text-xs rounded border bg-background px-1"
+                >
+                  {FONT_OPTIONS.map((f) => (
+                    <option key={f.key} value={f.key}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="flex items-center gap-1">
                 <Label className="text-xs">サイズ:</Label>
                 <Input

@@ -1,15 +1,37 @@
 import { PDFDocument, rgb } from "pdf-lib";
-import { loadJapaneseFont, registerFontkit } from "./font";
+import type { PDFFont } from "pdf-lib";
+import { loadFont, registerFontkit } from "./font";
+import type { FontKey } from "./font";
 import type { TextAnnotation, TextEdit } from "@/types/pdf";
+
+async function embedFonts(
+  pdf: PDFDocument,
+  items: { fontKey?: string }[]
+): Promise<Map<string, PDFFont>> {
+  registerFontkit(pdf);
+  const keys = new Set<FontKey>();
+  for (const item of items) {
+    keys.add((item.fontKey as FontKey) || "noto-sans");
+  }
+  const fontMap = new Map<string, PDFFont>();
+  for (const key of keys) {
+    const bytes = await loadFont(key);
+    const font = await pdf.embedFont(bytes);
+    fontMap.set(key, font);
+  }
+  return fontMap;
+}
+
+function getFont(fontMap: Map<string, PDFFont>, fontKey?: string): PDFFont {
+  return fontMap.get(fontKey || "noto-sans") || fontMap.values().next().value!;
+}
 
 export async function addTexts(
   pdfBuffer: ArrayBuffer,
   annotations: TextAnnotation[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBuffer);
-  registerFontkit(pdf);
-  const fontBytes = await loadJapaneseFont();
-  const font = await pdf.embedFont(fontBytes);
+  const fontMap = await embedFonts(pdf, annotations);
   const pages = pdf.getPages();
 
   for (const annotation of annotations) {
@@ -18,16 +40,13 @@ export async function addTexts(
 
     const page = pages[pageIndex];
     const { height } = page.getSize();
-
-    // Convert from canvas coordinates (top-left origin, Y down)
-    // to PDF coordinates (bottom-left origin, Y up)
     const pdfY = height - annotation.y - annotation.fontSize;
 
     page.drawText(annotation.text, {
       x: annotation.x,
       y: pdfY,
       size: annotation.fontSize,
-      font,
+      font: getFont(fontMap, annotation.fontKey),
       color: rgb(annotation.color.r, annotation.color.g, annotation.color.b),
     });
   }
@@ -41,17 +60,14 @@ export async function applyTextEdits(
   annotations: TextAnnotation[]
 ): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBuffer);
-  registerFontkit(pdf);
-  const fontBytes = await loadJapaneseFont();
-  const font = await pdf.embedFont(fontBytes);
+  const allItems = [...edits, ...annotations];
+  const fontMap = await embedFonts(pdf, allItems);
   const pages = pdf.getPages();
 
-  // Apply text edits (white rectangle + replacement text)
   for (const edit of edits) {
     if (edit.pageIndex < 0 || edit.pageIndex >= pages.length) continue;
     const page = pages[edit.pageIndex];
 
-    // Draw white rectangle to cover original text
     page.drawRectangle({
       x: edit.coverRect.x,
       y: edit.coverRect.y,
@@ -61,17 +77,15 @@ export async function applyTextEdits(
       borderWidth: 0,
     });
 
-    // Draw replacement text
     page.drawText(edit.newText, {
       x: edit.x,
       y: edit.y,
       size: edit.fontSize,
-      font,
+      font: getFont(fontMap, edit.fontKey),
       color: rgb(edit.color.r, edit.color.g, edit.color.b),
     });
   }
 
-  // Apply new text annotations
   for (const annotation of annotations) {
     if (annotation.pageIndex < 0 || annotation.pageIndex >= pages.length)
       continue;
@@ -83,7 +97,7 @@ export async function applyTextEdits(
       x: annotation.x,
       y: pdfY,
       size: annotation.fontSize,
-      font,
+      font: getFont(fontMap, annotation.fontKey),
       color: rgb(
         annotation.color.r,
         annotation.color.g,

@@ -49,6 +49,7 @@ export interface TextAnnotation {
   text: string;
   fontSize: number;
   color: { r: number; g: number; b: number };
+  fontKey?: string;
 }
 
 export interface ExtractedTextItem {
@@ -73,4 +74,5 @@ export interface TextEdit {
   y: number;
   fontSize: number;
   color: { r: number; g: number; b: number };
+  fontKey?: string;
 }
