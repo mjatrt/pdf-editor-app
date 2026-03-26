@@ -8,6 +8,7 @@ import {
   Droplets,
   Lock,
   FileText,
+  Type,
 } from "lucide-react";
 
 const tools = [
@@ -46,6 +47,12 @@ const tools = [
     description: "PDFのタイトル・作成者を編集",
     href: "/metadata",
     icon: FileText,
+  },
+  {
+    title: "テキスト追加",
+    description: "PDFの任意の位置にテキストを追加",
+    href: "/text-edit",
+    icon: Type,
   },
 ];
 

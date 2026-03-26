@@ -40,3 +40,13 @@ export interface PasswordOptions {
   action: "set" | "remove";
   password: string;
 }
+
+export interface TextAnnotation {
+  id: string;
+  pageIndex: number;
+  x: number;
+  y: number;
+  text: string;
+  fontSize: number;
+  color: { r: number; g: number; b: number };
+}

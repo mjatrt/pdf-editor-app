@@ -40,6 +40,12 @@ export function Header() {
           >
             透かし
           </Link>
+          <Link
+            href="/text-edit"
+            className="hover:text-primary transition-colors"
+          >
+            テキスト
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
