@@ -247,12 +247,6 @@ export function PdfTextEditor({
   );
   const currentEdits = textEdits.filter((e) => e.pageIndex === currentPage);
 
-  if (!ReactPdf) {
-    return <Skeleton className="w-full h-[600px]" />;
-  }
-
-  const { Document, Page } = ReactPdf;
-  const scale = pageSize ? RENDER_WIDTH / pageSize.width : 1;
   const documentOptions = useMemo(
     () => ({
       cMapUrl: `//unpkg.com/pdfjs-dist@${pdfjsVersion}/cmaps/`,
@@ -260,6 +254,13 @@ export function PdfTextEditor({
     }),
     [pdfjsVersion]
   );
+
+  if (!ReactPdf) {
+    return <Skeleton className="w-full h-[600px]" />;
+  }
+
+  const { Document, Page } = ReactPdf;
+  const scale = pageSize ? RENDER_WIDTH / pageSize.width : 1;
 
   return (
     <div className="space-y-4">
