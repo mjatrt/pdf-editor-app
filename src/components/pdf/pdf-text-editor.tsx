@@ -23,6 +23,10 @@ import type { TextAnnotation, ExtractedTextItem, TextEdit } from "@/types/pdf";
 
 const RENDER_WIDTH = 600;
 
+function getFontFamily(key: FontKey): string {
+  return FONT_OPTIONS.find((f) => f.key === key)?.fontFamily || "sans-serif";
+}
+
 interface PdfTextEditorProps {
   file: File;
   annotations: TextAnnotation[];
@@ -80,6 +84,18 @@ export function PdfTextEditor({
       setPdfjsVersion(mod.pdfjs.version);
       setReactPdf(mod);
     });
+  }, []);
+
+  // Load Google Fonts for preview
+  useEffect(() => {
+    const families = FONT_OPTIONS.map((f) => f.googleParam).join("&family=");
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${families}&display=swap`;
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
   }, []);
 
   // Clear cache when file changes
@@ -327,6 +343,19 @@ export function PdfTextEditor({
                   onChange={(e) => setColor(e.target.value)}
                   className="w-7 h-7 rounded border cursor-pointer"
                 />
+              </div>
+              <div className="flex items-center gap-1">
+                <Label className="text-xs mr-1">プレビュー:</Label>
+                <span
+                  className="px-2 py-0.5 border rounded bg-white text-sm truncate max-w-[200px]"
+                  style={{
+                    fontFamily: getFontFamily(fontKey),
+                    fontSize: Math.min(fontSize, 20),
+                    color,
+                  }}
+                >
+                  {inputText || "サンプル"}
+                </span>
               </div>
             </div>
           </TabsContent>
@@ -685,6 +714,20 @@ export function PdfTextEditor({
                   onChange={(e) => setEditColor(e.target.value)}
                   className="w-7 h-7 rounded border cursor-pointer"
                 />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">プレビュー</Label>
+              <div
+                className="mt-1 p-3 border rounded bg-white min-h-[48px] overflow-hidden break-all"
+                style={{
+                  fontFamily: getFontFamily(editFontKey),
+                  fontSize: Math.min(editFontSize, 32),
+                  color: editColor,
+                  lineHeight: 1.4,
+                }}
+              >
+                {editText || "テキストを入力してください"}
               </div>
             </div>
           </div>

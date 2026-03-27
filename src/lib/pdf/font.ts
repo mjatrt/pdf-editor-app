@@ -16,12 +16,19 @@ const FONT_FILES: Record<FontKey, string> = {
   "zen-maru": "/fonts/ZenMaruGothic-Regular.ttf",
 };
 
-export const FONT_OPTIONS: { key: FontKey; label: string }[] = [
-  { key: "noto-sans", label: "Noto Sans JP（ゴシック）" },
-  { key: "noto-serif", label: "Noto Serif JP（明朝）" },
-  { key: "mplus-1p", label: "M PLUS 1p" },
-  { key: "mplus-rounded", label: "M PLUS Rounded 1c（丸）" },
-  { key: "zen-maru", label: "Zen Maru Gothic（丸）" },
+export interface FontOption {
+  key: FontKey;
+  label: string;
+  fontFamily: string;
+  googleParam: string;
+}
+
+export const FONT_OPTIONS: FontOption[] = [
+  { key: "noto-sans", label: "Noto Sans JP（ゴシック）", fontFamily: "'Noto Sans JP', sans-serif", googleParam: "Noto+Sans+JP" },
+  { key: "noto-serif", label: "Noto Serif JP（明朝）", fontFamily: "'Noto Serif JP', serif", googleParam: "Noto+Serif+JP" },
+  { key: "mplus-1p", label: "M PLUS 1p", fontFamily: "'M PLUS 1p', sans-serif", googleParam: "M+PLUS+1p" },
+  { key: "mplus-rounded", label: "M PLUS Rounded 1c（丸）", fontFamily: "'M PLUS Rounded 1c', sans-serif", googleParam: "M+PLUS+Rounded+1c" },
+  { key: "zen-maru", label: "Zen Maru Gothic（丸）", fontFamily: "'Zen Maru Gothic', sans-serif", googleParam: "Zen+Maru+Gothic" },
 ];
 
 const fontCache = new Map<FontKey, ArrayBuffer>();
