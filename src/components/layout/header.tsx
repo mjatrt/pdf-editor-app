@@ -46,6 +46,12 @@ export function Header() {
           >
             テキスト
           </Link>
+          <Link
+            href="/image-to-pdf"
+            className="hover:text-primary transition-colors"
+          >
+            画像→PDF
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">

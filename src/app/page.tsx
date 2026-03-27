@@ -9,6 +9,7 @@ import {
   Lock,
   FileText,
   Type,
+  ImageIcon,
 } from "lucide-react";
 
 const tools = [
@@ -53,6 +54,12 @@ const tools = [
     description: "PDFの任意の位置にテキストを追加",
     href: "/text-edit",
     icon: Type,
+  },
+  {
+    title: "画像→PDF",
+    description: "画像ファイルをPDFに変換",
+    href: "/image-to-pdf",
+    icon: ImageIcon,
   },
 ];
 
